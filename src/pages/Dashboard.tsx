@@ -64,7 +64,7 @@ export default function Dashboard() {
               </p>
             </div>
             <div className="bg-white/20 backdrop-blur-sm rounded-xl p-6 border border-white/30">
-              <p className="text-cyan-100 text-sm mb-1">الكود الوطني</p>
+              <p className="text-cyan-100 text-sm mb-1">الكود</p>
               <p className="text-white text-2xl font-bold tracking-wider">{profile?.student_code}</p>
             </div>
           </div>
