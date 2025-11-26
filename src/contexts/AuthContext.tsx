@@ -7,7 +7,7 @@ type AuthContextType = {
   profile: Profile | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string, studentCode: string, nationalId: string, phoneNumber: string, governorate: string, administration: string, school: string, schoolYear: string) => Promise<{ error: AuthError | null }>;
+  signUp: (email: string, password: string, fullName: string, studentCode: string, phoneNumber: string, governorate: string, administration: string, school: string, schoolYear: string) => Promise<{ error: AuthError | null }>;
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<void>;
 };
@@ -65,7 +65,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     password: string,
     fullName: string,
     studentCode: string,
-    nationalId: string,
     phoneNumber: string,
     governorate: string,
     administration: string,
@@ -87,8 +86,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         id: data.user.id,
         full_name: fullName,
         student_code: studentCode,
-        national_id: nationalId,
         phone_number: phoneNumber,
+        governorate: governorate,
+        administration: administration,
+        school: school,
         school_year: schoolYear,
       });
 

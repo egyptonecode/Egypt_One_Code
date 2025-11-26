@@ -70,7 +70,6 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
       password,
       fullName,
       studentCode,
-      nationalId,
       phoneNumber,
       governorate,
       administration,
@@ -82,7 +81,7 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
 
     if (error) {
       if (error.message.includes('duplicate') || error.message.includes('unique')) {
-        setError('الرقم القومي أو الكود الوطني موجود بالفعل');
+        setError('الكود الوطني موجود بالفعل. قد يكون لديك حساب مسجل من قبل');
       } else if (error.message.includes('email')) {
         setError('البريد الإلكتروني موجود بالفعل');
       } else {
