@@ -11,15 +11,12 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [generatedCode, setGeneratedCode] = useState('');
   const [loading, setLoading] = useState(false);
   const { signUp } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setSuccess('');
     setLoading(true);
 
     if (nationalId.length !== 14) {
@@ -47,9 +44,10 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
     }
 
     const studentCode = `EG${governorate}${administration}${school}${nationalId.slice(-2)}`;
-    setGeneratedCode(studentCode);
 
     const { error } = await signUp(email, password, fullName, studentCode, nationalId);
+
+    setLoading(false);
 
     if (error) {
       if (error.message.includes('duplicate') || error.message.includes('unique')) {
@@ -59,12 +57,9 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
       } else {
         setError('حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة مرة أخرى');
       }
-      setLoading(false);
     } else {
-      setSuccess(`تم إنشاء الحساب بنجاح! كود الطالب الخاص بك هو: ${studentCode}`);
-      setTimeout(() => {
-        onNavigateToLogin();
-      }, 3000);
+      alert(`تم إنشاء الحساب بنجاح! الكود الخاص بك هو: ${studentCode}`);
+      onNavigateToLogin();
     }
   };
 
@@ -89,12 +84,6 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
               </div>
             )}
 
-            {success && (
-              <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm font-medium">
-                {success}
-              </div>
-            )}
-
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
                 الاسم الرباعي
@@ -108,7 +97,7 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition"
                   placeholder="محمد أحمد علي حسن"
                   required
-                  disabled={loading || !!success}
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -126,7 +115,7 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition"
                   placeholder="30012345678901"
                   required
-                  disabled={loading || !!success}
+                  disabled={loading}
                   maxLength={14}
                 />
               </div>
@@ -160,7 +149,7 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
                   onChange={(e) => setAdministration(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition appearance-none bg-white"
                   required
-                  disabled={loading || !!success}
+                  disabled={loading}
                 >
                   <option value="">اختر الإدارة التعليمية</option>
                   <option value="01">مرسى مطروح</option>
@@ -183,7 +172,7 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
                   onChange={(e) => setSchool(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition appearance-none bg-white"
                   required
-                  disabled={loading || !!success}
+                  disabled={loading}
                 >
                   <option value="">اختر المدرسة</option>
                   <option value="01">مدرسة الضبعة النووية</option>
@@ -206,7 +195,7 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition"
                   placeholder="example@email.com"
                   required
-                  disabled={loading || !!success}
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -224,7 +213,7 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition"
                   placeholder="••••••••"
                   required
-                  disabled={loading || !!success}
+                  disabled={loading}
                   minLength={6}
                 />
               </div>
@@ -233,10 +222,10 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
 
             <button
               type="submit"
-              disabled={loading || !!success}
+              disabled={loading}
               className="w-full bg-gradient-to-r from-cyan-500 to-blue-700 text-white py-3 rounded-lg font-medium hover:from-cyan-600 hover:to-blue-800 transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
             >
-              {loading ? 'جاري الإنشاء...' : success ? 'جاري التحويل...' : 'إنشاء حساب'}
+              {loading ? 'جاري الإنشاء...' : 'إنشاء حساب'}
             </button>
           </form>
 
