@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import { UserPlus, User, CreditCard, Mail, Lock, MapPin, Building2, School } from 'lucide-react';
+import { UserPlus, User, CreditCard, Mail, Lock, MapPin, Building2, School, Phone } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () => void }) {
   const [fullName, setFullName] = useState('');
   const [nationalId, setNationalId] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [governorate] = useState('20');
   const [administration, setAdministration] = useState('');
   const [school, setSchool] = useState('');
+  const [schoolYear, setSchoolYear] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,8 +21,20 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
     setError('');
     setLoading(true);
 
+    if (!fullName.trim()) {
+      setError('يرجى إدخال الاسم الرباعي');
+      setLoading(false);
+      return;
+    }
+
     if (nationalId.length !== 14) {
       setError('يجب أن يكون الرقم القومي 14 رقماً');
+      setLoading(false);
+      return;
+    }
+
+    if (!phoneNumber.trim()) {
+      setError('يرجى إدخال رقم الهاتف');
       setLoading(false);
       return;
     }
@@ -37,6 +51,12 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
       return;
     }
 
+    if (!email.trim()) {
+      setError('يرجى إدخال البريد الإلكتروني');
+      setLoading(false);
+      return;
+    }
+
     if (password.length < 6) {
       setError('يجب أن تكون كلمة المرور 6 أحرف على الأقل');
       setLoading(false);
@@ -45,7 +65,18 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
 
     const studentCode = `EG${governorate}${administration}${school}${nationalId.slice(-2)}`;
 
-    const { error } = await signUp(email, password, fullName, studentCode, nationalId);
+    const { error } = await signUp(
+      email,
+      password,
+      fullName,
+      studentCode,
+      nationalId,
+      phoneNumber,
+      governorate,
+      administration,
+      school,
+      schoolYear
+    );
 
     setLoading(false);
 
@@ -124,6 +155,25 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
 
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
+                رقم الهاتف
+              </label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="tel"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition"
+                  placeholder="201012345678"
+                  required
+                  disabled={loading}
+                />
+              </div>
+              <p className="text-xs text-gray-500">أدخل رقم هاتفك المحمول</p>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
                 المحافظة
               </label>
               <div className="relative">
@@ -179,6 +229,23 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
                   <option value="02">مدرسة الضبعة الثانوية بنين</option>
                   <option value="03">مدرسة الضبعة الثانوية بنات</option>
                 </select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                السنة الدراسية
+              </label>
+              <div className="relative">
+                <School className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  value={schoolYear}
+                  onChange={(e) => setSchoolYear(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition"
+                  placeholder="مثال: الثانوية العامة 2024"
+                  disabled={loading}
+                />
               </div>
             </div>
 
