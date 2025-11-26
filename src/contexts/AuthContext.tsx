@@ -7,7 +7,7 @@ type AuthContextType = {
   profile: Profile | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string, studentCode: string, schoolYear: string) => Promise<{ error: AuthError | null }>;
+  signUp: (email: string, password: string, fullName: string, studentCode: string, nationalId: string) => Promise<{ error: AuthError | null }>;
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<void>;
 };
@@ -65,11 +65,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     password: string,
     fullName: string,
     studentCode: string,
-    schoolYear: string
+    nationalId: string
   ) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          full_name: fullName,
+          student_code: studentCode,
+          national_id: nationalId,
+        },
+      },
     });
 
     if (error || !data.user) {
@@ -82,12 +89,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         id: data.user.id,
         full_name: fullName,
         student_code: studentCode,
-        school_year: schoolYear,
+        national_id: nationalId,
+        school_year: '',
       });
 
     if (profileError) {
+      await supabase.auth.signOut();
       return { error: profileError as AuthError };
     }
+
+    await supabase.auth.signOut();
 
     return { error: null };
   };

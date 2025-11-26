@@ -9,6 +9,7 @@ export type Profile = {
   id: string;
   full_name: string;
   student_code: string;
+  national_id: string;
   school_year: string;
   avatar_url: string;
   created_at: string;

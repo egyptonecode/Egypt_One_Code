@@ -1,21 +1,44 @@
 import { useState } from 'react';
-import { UserPlus, User, CreditCard, Mail, Lock, GraduationCap } from 'lucide-react';
+import { UserPlus, User, CreditCard, Mail, Lock, MapPin, Building2, School } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () => void }) {
   const [fullName, setFullName] = useState('');
-  const [studentCode, setStudentCode] = useState('');
-  const [schoolYear, setSchoolYear] = useState('');
+  const [nationalId, setNationalId] = useState('');
+  const [governorate] = useState('20');
+  const [administration, setAdministration] = useState('');
+  const [school, setSchool] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [generatedCode, setGeneratedCode] = useState('');
   const [loading, setLoading] = useState(false);
   const { signUp } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setLoading(true);
+
+    if (nationalId.length !== 14) {
+      setError('يجب أن يكون الرقم القومي 14 رقماً');
+      setLoading(false);
+      return;
+    }
+
+    if (!administration) {
+      setError('يرجى اختيار الإدارة التعليمية');
+      setLoading(false);
+      return;
+    }
+
+    if (!school) {
+      setError('يرجى اختيار المدرسة');
+      setLoading(false);
+      return;
+    }
 
     if (password.length < 6) {
       setError('يجب أن تكون كلمة المرور 6 أحرف على الأقل');
@@ -23,19 +46,26 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
       return;
     }
 
-    const { error } = await signUp(email, password, fullName, studentCode, schoolYear);
+    const studentCode = `EG${governorate}${administration}${school}${nationalId.slice(-2)}`;
+    setGeneratedCode(studentCode);
+
+    const { error } = await signUp(email, password, fullName, studentCode, nationalId);
 
     if (error) {
-      if (error.message.includes('duplicate')) {
-        setError('الكود الوطني موجود بالفعل');
+      if (error.message.includes('duplicate') || error.message.includes('unique')) {
+        setError('الرقم القومي أو الكود الوطني موجود بالفعل');
       } else if (error.message.includes('email')) {
         setError('البريد الإلكتروني موجود بالفعل');
       } else {
         setError('حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة مرة أخرى');
       }
+      setLoading(false);
+    } else {
+      setSuccess(`تم إنشاء الحساب بنجاح! كود الطالب الخاص بك هو: ${studentCode}`);
+      setTimeout(() => {
+        onNavigateToLogin();
+      }, 3000);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -59,9 +89,15 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
               </div>
             )}
 
+            {success && (
+              <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm font-medium">
+                {success}
+              </div>
+            )}
+
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
-                الاسم الكامل
+                الاسم الرباعي
               </label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -70,57 +106,89 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition"
-                  placeholder="محمد أحمد علي"
+                  placeholder="محمد أحمد علي حسن"
                   required
-                  disabled={loading}
+                  disabled={loading || !!success}
                 />
               </div>
             </div>
 
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
-                الكود الوطني (الرقم القومي)
+                الرقم القومي
               </label>
               <div className="relative">
                 <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
-                  value={studentCode}
-                  onChange={(e) => setStudentCode(e.target.value)}
+                  value={nationalId}
+                  onChange={(e) => setNationalId(e.target.value.replace(/\D/g, '').slice(0, 14))}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition"
                   placeholder="30012345678901"
                   required
-                  disabled={loading}
+                  disabled={loading || !!success}
+                  maxLength={14}
                 />
+              </div>
+              <p className="text-xs text-gray-500">أدخل الرقم القومي المكون من 14 رقماً</p>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                المحافظة
+              </label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <select
+                  value={governorate}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition appearance-none bg-gray-50"
+                  disabled
+                >
+                  <option value="20">مرسى مطروح</option>
+                </select>
               </div>
             </div>
 
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
-                السنة الدراسية
+                الإدارة التعليمية
               </label>
               <div className="relative">
-                <GraduationCap className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <select
-                  value={schoolYear}
-                  onChange={(e) => setSchoolYear(e.target.value)}
+                  value={administration}
+                  onChange={(e) => setAdministration(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition appearance-none bg-white"
                   required
-                  disabled={loading}
+                  disabled={loading || !!success}
                 >
-                  <option value="">اختر السنة الدراسية</option>
-                  <option value="الصف الأول الابتدائي">الصف الأول الابتدائي</option>
-                  <option value="الصف الثاني الابتدائي">الصف الثاني الابتدائي</option>
-                  <option value="الصف الثالث الابتدائي">الصف الثالث الابتدائي</option>
-                  <option value="الصف الرابع الابتدائي">الصف الرابع الابتدائي</option>
-                  <option value="الصف الخامس الابتدائي">الصف الخامس الابتدائي</option>
-                  <option value="الصف السادس الابتدائي">الصف السادس الابتدائي</option>
-                  <option value="الصف الأول الإعدادي">الصف الأول الإعدادي</option>
-                  <option value="الصف الثاني الإعدادي">الصف الثاني الإعدادي</option>
-                  <option value="الصف الثالث الإعدادي">الصف الثالث الإعدادي</option>
-                  <option value="الصف الأول الثانوي">الصف الأول الثانوي</option>
-                  <option value="الصف الثاني الثانوي">الصف الثاني الثانوي</option>
-                  <option value="الصف الثالث الثانوي">الصف الثالث الثانوي</option>
+                  <option value="">اختر الإدارة التعليمية</option>
+                  <option value="01">مرسى مطروح</option>
+                  <option value="05">الضبعة</option>
+                  <option value="06">العلمين</option>
+                  <option value="07">الحمام</option>
+                  <option value="08">سيوة</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                المدرسة
+              </label>
+              <div className="relative">
+                <School className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <select
+                  value={school}
+                  onChange={(e) => setSchool(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition appearance-none bg-white"
+                  required
+                  disabled={loading || !!success}
+                >
+                  <option value="">اختر المدرسة</option>
+                  <option value="01">مدرسة الضبعة النووية</option>
+                  <option value="02">مدرسة المتفوقين (STEM)</option>
+                  <option value="03">مدرسة تجريبية/عام</option>
                 </select>
               </div>
             </div>
@@ -138,7 +206,7 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition"
                   placeholder="example@email.com"
                   required
-                  disabled={loading}
+                  disabled={loading || !!success}
                 />
               </div>
             </div>
@@ -156,7 +224,7 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition"
                   placeholder="••••••••"
                   required
-                  disabled={loading}
+                  disabled={loading || !!success}
                   minLength={6}
                 />
               </div>
@@ -165,10 +233,10 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !!success}
               className="w-full bg-gradient-to-r from-cyan-500 to-blue-700 text-white py-3 rounded-lg font-medium hover:from-cyan-600 hover:to-blue-800 transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
             >
-              {loading ? 'جاري الإنشاء...' : 'إنشاء حساب'}
+              {loading ? 'جاري الإنشاء...' : success ? 'جاري التحويل...' : 'إنشاء حساب'}
             </button>
           </form>
 
