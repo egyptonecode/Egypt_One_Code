@@ -165,7 +165,7 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
                   <option value="">اختر الإدارة التعليمية</option>
                   <option value="01">مرسى مطروح</option>
                   <option value="05">الضبعة</option>
-                  <option value="06">العلمين</option>
+                  <option value="06">العالمين</option>
                   <option value="07">الحمام</option>
                   <option value="08">سيوة</option>
                 </select>
@@ -187,8 +187,8 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
                 >
                   <option value="">اختر المدرسة</option>
                   <option value="01">مدرسة الضبعة النووية</option>
-                  <option value="02">مدرسة المتفوقين (STEM)</option>
-                  <option value="03">مدرسة تجريبية/عام</option>
+                  <option value="02">مدرسة الضبعة الثانوية بنين</option>
+                  <option value="03">مدرسة الضبعة الثانوية بنات</option>
                 </select>
               </div>
             </div>
