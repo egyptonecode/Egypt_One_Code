@@ -163,7 +163,7 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition"
-                  placeholder="201012345678"
+                  placeholder="01012345678"
                   required
                   disabled={loading}
                 />
