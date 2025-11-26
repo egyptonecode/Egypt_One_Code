@@ -242,7 +242,7 @@ export default function SignUp({ onNavigateToLogin }: { onNavigateToLogin: () =>
                   value={schoolYear}
                   onChange={(e) => setSchoolYear(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition"
-                  placeholder="مثال: الثانوية العامة 2024"
+                  placeholder="مثال: الصف الثالث الثانوي"
                   disabled={loading}
                 />
               </div>
